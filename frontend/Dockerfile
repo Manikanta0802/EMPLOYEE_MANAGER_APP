@@ -1,4 +1,3 @@
-# ---------- Build stage -----------
 FROM node:20-alpine AS build
 WORKDIR /app
 
@@ -8,10 +7,8 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# ---------- Run stage ----------
 FROM nginx:alpine
-
-# IMPORTANT FIX 👇
+RUN rm -rf /usr/share/nginx/html/*
 COPY --from=build /app/dist/employee-availability-frontend/ /usr/share/nginx/html/
 
 EXPOSE 80
