@@ -37,14 +37,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: frontend
-
-      - name: Fix Angular CLI permissions
-        run: chmod +x ./node_modules/.bin/ng
-        working-directory: frontend
-
       # ------------------------------
       # Login to GHCR
       # ------------------------------
