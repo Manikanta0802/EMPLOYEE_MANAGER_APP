@@ -7,8 +7,8 @@ import { Observable } from 'rxjs';
 })
 export class EmployeeService {
 
-  private EMPLOYEE_API = 'http://localhost:8080/api/employees';
-  private ATTENDANCE_API = 'http://localhost:8080/api/attendance';
+  private EMPLOYEE_API = '/api/employees';
+  private ATTENDANCE_API = '/api/attendance';
 
   constructor(private http: HttpClient) {}
 

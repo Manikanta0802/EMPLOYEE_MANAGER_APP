@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class AttendanceService {
 
-  private baseUrl = 'http://localhost:8080/api/attendance';
+  private baseUrl = '/api/attendance';
 
   constructor(private http: HttpClient) {}
 

@@ -29,7 +29,7 @@ interface EmployeeAvailability {
 })
 export class AdminDashboardComponent implements OnInit {
 
-  private API = 'http://localhost:8080/api/attendance/admin/employees-attendance';
+  private API = '/api/attendance/admin/employees-attendance';
 
 
   departments = ['VEDC', 'GUSS', 'IDIS', 'EMRI'];
@@ -166,7 +166,7 @@ export class AdminDashboardComponent implements OnInit {
 
     this.http
         .put(
-            `http://localhost:8080/api/attendance/admin/update/${payload.employeeId}`,
+            `/api/attendance/admin/update/${payload.employeeId}`,
             payload
         )
         .subscribe({
