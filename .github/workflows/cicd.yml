@@ -45,12 +45,6 @@ jobs:
         run: chmod +x ./node_modules/.bin/ng
         working-directory: frontend
 
-      - name: Build & Push Frontend Image
-        run: |
-          docker build -t $FRONTEND_IMAGE:latest frontend
-          docker push $FRONTEND_IMAGE:latest
-
-
       # ------------------------------
       # Login to GHCR
       # ------------------------------
