@@ -1,0 +1,51 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pr-check:
+    name: PR Validation
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Tests
+        run: |
+          echo "Running tests..."
+
+          # Replace this with your actual test command.
+          #
+          # Example:
+          # npm ci
+          # npm test
+          #
+          # Python:
+          # pip install -r requirements.txt
+          # pytest
+
+      - name: Build Validation
+        run: |
+          echo "Running build validation..."
+
+          # Replace this with your actual build command.
+          #
+          # Example:
+          # npm run build
+          #
+          # Docker:
+          # docker build -t pr-test-image .
