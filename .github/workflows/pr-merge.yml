@@ -1,0 +1,118 @@
+name: Merge Approved PR
+
+on:
+  pull_request_review:
+    types:
+      - submitted
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge-pr:
+    name: Merge Approved PR
+    runs-on: ubuntu-latest
+
+    # Run only when the submitted review is an approval
+    if: github.event.review.state == 'approved'
+
+    steps:
+
+      # --------------------------------------------------
+      # 1. Display PR information
+      # --------------------------------------------------
+
+      - name: Get PR Information
+        run: |
+          echo "PR Number      : ${{ github.event.pull_request.number }}"
+          echo "Source Branch  : ${{ github.event.pull_request.head.ref }}"
+          echo "Target Branch  : ${{ github.event.pull_request.base.ref }}"
+          echo "Reviewer       : ${{ github.event.review.user.login }}"
+
+      # --------------------------------------------------
+      # 2. Make sure target branch is develop
+      # --------------------------------------------------
+
+      - name: Verify Target Branch
+        run: |
+          TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+
+          echo "Target branch: $TARGET_BRANCH"
+
+          if [ "$TARGET_BRANCH" != "develop" ]; then
+            echo "This workflow only allows merging into develop."
+            exit 1
+          fi
+
+      # --------------------------------------------------
+      # 3. Make sure PR is still open
+      # --------------------------------------------------
+
+      - name: Check PR is Open
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          STATE=$(gh pr view "$PR_NUMBER" \
+            --json state \
+            --jq '.state')
+
+          echo "PR State: $STATE"
+
+          if [ "$STATE" != "OPEN" ]; then
+            echo "PR is not open."
+            exit 1
+          fi
+
+      # --------------------------------------------------
+      # 4. Verify approval
+      # --------------------------------------------------
+
+      - name: Check PR Approval
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          APPROVALS=$(gh pr view "$PR_NUMBER" \
+            --json reviews \
+            --jq '[.reviews[] | select(.state == "APPROVED")] | length')
+
+          echo "Number of approvals: $APPROVALS"
+
+          if [ "$APPROVALS" -lt 1 ]; then
+            echo "No approved review found."
+            exit 1
+          fi
+
+          echo "PR has been approved."
+
+      # --------------------------------------------------
+      # 5. Check PR validation
+      # --------------------------------------------------
+
+      - name: Check PR Status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          echo "Checking PR status..."
+
+          gh pr checks "$PR_NUMBER" --required
+
+      # --------------------------------------------------
+      # 6. Merge PR
+      # --------------------------------------------------
+
+      - name: Merge Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          echo "Merging PR #$PR_NUMBER"
+
+          gh pr merge "$PR_NUMBER" \
+            --merge \
+            --delete-branch=false
+
+          echo "PR merged successfully."
